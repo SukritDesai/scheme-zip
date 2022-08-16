@@ -42,3 +42,28 @@
       #nil
       (cons (symbol->char (car symbol-list))
             (symbol-list->char-list (cdr symbol-list)))))
+
+(define (inc-symbol-counter symbol items)
+  (cond ((null? items) #nil)
+        ((equal? symbol (caar items))
+         (cons (cons symbol (increment (cdr (car items))))
+               (cdr items)))
+        ((not (equal? symbol (caar items)))
+         (inc-symbol-counter symbol (cdr items)))))
+
+(define (increment int)
+  (+ 1 int))
+
+(define (symbol-counter symbol-list)
+  (define (iter new-list symbol-list)
+    (cond ((null? symbol-list) new-list)
+          ((symbol-in-tree? (car symbol-list)
+                            new-list)
+           (iter (inc-symbol-counter
+                  (car symbol-list) new-list)
+                 (cdr symbol-list)))
+          ((not (symbol-in-tree? (car symbol-list)
+                                 new-list))
+           (iter (append new-list
+                         (cons (car symbol-list) 1)) (cdr symbol-list)))))
+  (iter (list) symbol-list))
