@@ -15,6 +15,7 @@
 
 (define (symbol-in-tree? symbol tree)
   (cond ((null? tree) #f)
+        ((number? tree) #f)
         ((list? (car tree))
          (if (element-of-set? symbol (car tree))
              #t
@@ -45,11 +46,13 @@
 
 (define (inc-symbol-counter symbol items)
   (cond ((null? items) #nil)
-        ((equal? symbol (caar items))
-         (cons (cons symbol (increment (cdr (car items))))
-               (cdr items)))
-        ((not (equal? symbol (caar items)))
-         (inc-symbol-counter symbol (cdr items)))))
+        ((list? items)
+         (if (equal? symbol (caar items))
+             (cons (cons symbol (increment (cdr (car items))))
+                   (cdr items))
+             (inc-symbol-counter symbol (cdr items))))
+        ((equal? symbol (car items))
+         (cons symbol (increment (cdr items))))))
 
 (define (increment int)
   (+ 1 int))
@@ -64,6 +67,7 @@
                  (cdr symbol-list)))
           ((not (symbol-in-tree? (car symbol-list)
                                  new-list))
-           (iter (append new-list
-                         (cons (car symbol-list) 1)) (cdr symbol-list)))))
+           (iter (cons new-list
+                         (cons (car symbol-list) 1))
+                 (cdr symbol-list)))))
   (iter (list) symbol-list))
